@@ -25,48 +25,48 @@ public class RedisConfig {
     @Bean
     @ConfigurationProperties(prefix = "spring.redis")
     public RedisConnectionFactory redisConnectionFactory() {
-	return new JedisConnectionFactory();
+        return new JedisConnectionFactory();
 
     }
 
     @Bean(name = "stringRedisTemplate")
     public StringRedisTemplate stringRedisTemplate() {
-	StringRedisTemplate redisTemplate = new StringRedisTemplate(redisConnectionFactory());
-	redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-	redisTemplate.setKeySerializer(new StringRedisSerializer());
-	return redisTemplate;
+        StringRedisTemplate redisTemplate = new StringRedisTemplate(redisConnectionFactory());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
     }
 
     @Primary
     @Bean(name = "cacheManager")
     public CacheManager cacheManager() {
-	RedisCacheManager cacheManager = new RedisCacheManager(stringRedisTemplate());
-	cacheManager.setDefaultExpiration(500);
-	cacheManager.setUsePrefix(true);
-	return cacheManager;
+        RedisCacheManager cacheManager = new RedisCacheManager(stringRedisTemplate());
+        cacheManager.setDefaultExpiration(500);
+        cacheManager.setUsePrefix(true);
+        return cacheManager;
     }
 
     @Bean(name = "keyGenerator1")
     public KeyGenerator keyGenerator() {
-	return new KeyGenerator() {
-	    @Override
-	    public Object generate(Object target, Method method, Object... params) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(target.getClass().getSimpleName());
-		sb.append(KEY_SEPERATOR);
-		sb.append(method.getName());
-		sb.append(KEY_SEPERATOR);
-		for (Object param : params) {
-		    sb.append(param.toString());
-		    sb.append(KEY_SEPERATOR);
-		}
-		String str = sb.toString();
-		String key = str.substring(0, str.length() - 1);
-		System.out.println(key);
+        return new KeyGenerator() {
+            @Override
+            public Object generate(Object target, Method method, Object... params) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(target.getClass().getSimpleName());
+                sb.append(KEY_SEPERATOR);
+                sb.append(method.getName());
+                sb.append(KEY_SEPERATOR);
+                for (Object param : params) {
+                    sb.append(param.toString());
+                    sb.append(KEY_SEPERATOR);
+                }
+                String str = sb.toString();
+                String key = str.substring(0, str.length() - 1);
+                System.out.println(key);
 
-		return key;
-	    }
-	};
+                return key;
+            }
+        };
     }
 
 }
