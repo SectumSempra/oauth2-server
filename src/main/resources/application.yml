@@ -1,0 +1,51 @@
+spring:
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+  profiles:
+    active: local
+  datasource:
+    hikari:
+      dataSourceClassName: org.postgresql.ds.PGPoolingDataSource
+      autoCommit: false
+      username: postgres
+      password: postgres
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      connectionTestQuery: SELECT 1
+      maximumPoolSize: 5
+      poolName: hikahikaAuthServer
+      dataSourceProperties:
+        currentSchema: hr
+        databaseName: postgres
+        serverName: 127.0.0.1
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect  
+    properties:
+      hibernate:
+        temp:
+         use_jdbc_metadata_defaults : false
+        jdbc:
+          lob: 
+            non_contextual_creation : true  
+      
+server:
+  port: 18085
+security:
+  basic:
+    enable: false
+  oauth2:
+    client:
+      client-id: demo
+      client-secret: demo
+      scope: demoScope
+    authorization:
+      check-token-access: permitAll()
+    resource:
+      id: authServerResource
+      filter-order: 3
+logging:
+  level:
+    org.springframework.security: DEBUG
