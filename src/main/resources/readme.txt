@@ -1,3 +1,8 @@
+spring 1.5  redis 3 
+spring 2 redis 4,5 ile calisiyor ,
+"org.springframework.data.redis.serializer.SerializationException:
+local class incompatible: stream classdesc serialVersionUID = 500, local class serialVersionUID = 420
+"
 ---
 curl -X POST -d "grant_type=password&username=b&password=b&client_id=demo&client_secret=demo" http://localhost:18085/oauth/token
 
