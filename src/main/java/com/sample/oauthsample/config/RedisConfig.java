@@ -1,20 +1,18 @@
 package com.sample.oauthsample.config;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @PropertySource("classpath:redis.properties")
@@ -29,21 +27,19 @@ public class RedisConfig {
 
     }
 
-    @Bean(name = "stringRedisTemplate")
-    public StringRedisTemplate stringRedisTemplate() {
-        StringRedisTemplate redisTemplate = new StringRedisTemplate(redisConnectionFactory());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        return redisTemplate;
+    @Bean
+    public RedisCacheConfiguration cacheConfiguration() {
+        RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(600)).disableCachingNullValues();
+        return cacheConfig;
     }
 
     @Primary
     @Bean(name = "cacheManager")
-    public CacheManager cacheManager() {
-        RedisCacheManager cacheManager = new RedisCacheManager(stringRedisTemplate());
-        cacheManager.setDefaultExpiration(500);
-        cacheManager.setUsePrefix(true);
-        return cacheManager;
+    public RedisCacheManager cacheManager() {
+        RedisCacheManager rcm = RedisCacheManager.builder(redisConnectionFactory()).cacheDefaults(cacheConfiguration())
+                .transactionAware().build();
+        return rcm;
     }
 
     @Bean(name = "keyGenerator1")

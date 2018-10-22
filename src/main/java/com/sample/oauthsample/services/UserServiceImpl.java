@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Users findById(Integer id) {
-        return usersRepository.findOne(id);
+        return usersRepository.findById(id).get();
 
     }
 
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Integer id) {
-        usersRepository.delete(usersRepository.findOne(id));
+        usersRepository.delete(usersRepository.findById(id).get());
 
     }
 

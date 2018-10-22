@@ -33,7 +33,7 @@ insert into roles
 values(2,'STANDARD');
 
 insert into users
-values(1,1,'b@b.com','b','b','$2a$10$QKGpzsLbgvEYPG9DCcAvxueVWP7dzf8GzakWxVI7GFlwjGAlnuJjC');
+values(1,1,'b@b.com','b','b','$2a$10$NNrk/tkac02cwdLVCM98SOoqpCNNyTymcaaQvXpuuOEhIlb890slK');
 
 insert into user_role
 values(1,1);

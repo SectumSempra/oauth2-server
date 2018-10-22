@@ -1,12 +1,15 @@
 package com.sample.oauthsample.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -32,22 +35,27 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private String RESOURCE_ID;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    @Qualifier("bCryptPasswordEncoder")
+    public BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    @Qualifier(BeanIds.AUTHENTICATION_MANAGER)
+    public AuthenticationManager authenticationManager;
 
     @Autowired
     private UserDetailsService customUserDetailsService;
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-	security.allowFormAuthenticationForClients();
-	security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+        security.allowFormAuthenticationForClients();
+        security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
     }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-	clients.inMemory().withClient(CLIENT_ID).secret(SECRET_ID).accessTokenValiditySeconds(5000)
-		.authorizedGrantTypes("password", "refresh_token").scopes(SCOPES).autoApprove(true)
-		.resourceIds(RESOURCE_ID);
+        clients.inMemory().withClient(CLIENT_ID).secret(bCryptPasswordEncoder.encode(SECRET_ID))
+                .accessTokenValiditySeconds(5000).authorizedGrantTypes("password", "refresh_token").scopes(SCOPES)
+                .autoApprove(true).resourceIds(RESOURCE_ID);
     }
 
     @Autowired
@@ -55,13 +63,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Bean(name = "authRedisTokenStore")
     public TokenStore tokenStore() {
-	return new RedisTokenStore(connectionFactory);
+        return new RedisTokenStore(connectionFactory);
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-	endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager)
-		.userDetailsService(customUserDetailsService);
+        endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager)
+                .userDetailsService(customUserDetailsService);
     }
 
 }
