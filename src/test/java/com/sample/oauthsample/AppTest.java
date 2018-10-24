@@ -8,6 +8,6 @@ public class AppTest {
 	@Test
 	public void testBCryptPasswordEncoder() {
 		BCryptPasswordEncoder b = new BCryptPasswordEncoder();
-		System.out.println(b.encode("b"));
+		System.out.println(b.encode("demo"));
 	}
 }
