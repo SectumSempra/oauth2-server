@@ -4,7 +4,7 @@ spring:
       dataSourceClassName: org.postgresql.ds.PGPoolingDataSource
       autoCommit: false
       username: postgres
-      password: 123456
+      password: postgres
       connectionTimeout: 30000
       idleTimeout: 600000
       connectionTestQuery: SELECT 1
