@@ -15,7 +15,7 @@ pre_deploy_test:
      GIT_DEPTH: "3"
    stage: test
    script:
-     - mvn clean install -B -Dserver.port=28084
+     - mvn clean install -B -Dserver.port=28085
    only:
     - test
    tags:
@@ -27,7 +27,7 @@ deploy_test:
     - mvn clean compile
     - mvn install package dockerfile:build
     - docker stop oauth2-server-test || true && docker rm oauth2-server-test || true
-    - docker run --name oauth2-server-test -d --restart=always -v /var/log/backendlog:/var/log/backendlog -p 28084:28084 -t backend-image/oauth2-server
+    - docker run --name oauth2-server-test -d --restart=always -v /var/log/backendlog:/var/log/backendlog -p 28085:28085 -t backend-image/oauth2-server
   only:
     - test
   tags:
