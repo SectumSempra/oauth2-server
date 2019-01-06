@@ -1,0 +1,39 @@
+before_script:
+  - mvn -v
+  
+after_script:
+  - docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+
+stages:
+  - test
+  - deploy
+  
+## 192.168.1.11
+pre_deploy_test:
+   variables:
+     GIT_STRATEGY: clone
+     GIT_DEPTH: "3"
+   stage: test
+   script:
+     - mvn clean install -B -Dserver.port=28084
+   only:
+    - test
+   tags:
+    - test-server
+    
+deploy_test:
+  stage: deploy
+  script:
+    - mvn clean compile
+    - mvn install package dockerfile:build
+    - docker stop oauth2-server-test || true && docker rm oauth2-server-test || true
+    - docker run --name oauth2-server-test -d --restart=always -v /var/log/backendlog:/var/log/backendlog -p 28084:28084 -t backend-image/oauth2-server
+  only:
+    - test
+  tags:
+    - test-server
+    
+   
+    
+
+## end
