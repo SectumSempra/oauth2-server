@@ -32,6 +32,31 @@ deploy_test:
     - test
   tags:
     - test-server
+
+## runner2
+pre_deploy_test_2:
+   variables:
+     GIT_STRATEGY: clone
+     GIT_DEPTH: "3"
+   stage: test
+   script:
+     - mvn clean install -B -Dserver.port=28085
+   only:
+    - test
+   tags:
+    - test-server2
+    
+deploy_test_2:
+  stage: deploy
+  script:
+    - mvn clean compile
+    - mvn install package dockerfile:build
+    - docker stop oauth2-server-test || true && docker rm oauth2-server-test || true
+    - docker run --name oauth2-server-test -d --restart=always -v /var/log/backendlog:/var/log/backendlog -p 28085:28085 -e "SPRING_PROFILES_ACTIVE=test" -t backend-image/oauth2-server
+  only:
+    - test
+  tags:
+    - test-server2
     
    
     
