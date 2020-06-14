@@ -15,13 +15,15 @@ import com.sample.oauthsample.repository.UsersRepository;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UsersRepository usersRepository;
+	@Autowired
+	private UsersRepository usersRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Users> usersOptional = usersRepository.findByName(username);
-        usersOptional.orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
-        return usersOptional.map(CustomUserDetails::new).get();
-    }
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		System.err.println("******DAOAuthenticationProvider*******");
+
+		Optional<Users> usersOptional = usersRepository.findByName(username);
+		usersOptional.orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+		return usersOptional.map(CustomUserDetails::new).get();
+	}
 }

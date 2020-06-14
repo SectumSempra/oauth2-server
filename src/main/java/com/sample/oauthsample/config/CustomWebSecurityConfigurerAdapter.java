@@ -23,78 +23,79 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import com.sample.oauthsample.config.provider.CustomAuthenticationProvider;
+
 @Configuration
 @EnableWebSecurity
 public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**").antMatchers("/h2-db/**");
-    }
+	@Override
+	public void configure(WebSecurity web) throws Exception {
+		web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**").antMatchers("/h2-db/**");
+	}
 
-    @Bean("bCryptPasswordEncoder")
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean("bCryptPasswordEncoder")
+	public BCryptPasswordEncoder bCryptPasswordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Autowired
-    private UserDetailsService customUserDetailsService;
+	@Autowired
+	private UserDetailsService customUserDetailsService;
 
-    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+	@Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(customUserDetailsService);
-        authenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
-        authenticationProvider.setHideUserNotFoundExceptions(false);
-        return authenticationProvider;
-    }
+	@Autowired
+	private CustomAuthenticationProvider customAuthenticationProvider;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authenticationProvider());
-    }
+	@Bean
+	public DaoAuthenticationProvider daoAuthenticationProvider() {
+		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+		authenticationProvider.setUserDetailsService(customUserDetailsService);
+		authenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
+		authenticationProvider.setHideUserNotFoundExceptions(false);
+		return authenticationProvider;
+	}
 
-    @Autowired
-    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService);
-        auth.authenticationProvider(authenticationProvider());
-    }
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.authenticationProvider(customAuthenticationProvider);
+		auth.authenticationProvider(daoAuthenticationProvider());
+	}
 
-    /**/
+	/**/
 
-    /************ Cors ***********/
-    private final List<String> allowedOrigins = Arrays.asList("*");
+	/************ Cors ***********/
+	private final List<String> allowedOrigins = Arrays.asList("*");
 
-    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "Access-Control-Allow-Origin",
-            "Authorization");
+	private final List<String> allowedHeaders = Arrays.asList("Content-Type", "Access-Control-Allow-Origin",
+			"Authorization");
 
-    private final List<String> allowedMethods = Arrays.asList("POST", "GET", "OPTIONS", "PUT");
+	private final List<String> allowedMethods = Arrays.asList("POST", "GET", "OPTIONS", "PUT");
 
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(allowedOrigins);
-        config.setAllowCredentials(true);
-        config.setAllowedMethods(allowedMethods);
-        config.setAllowedHeaders(allowedHeaders);
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
-    /**/
+	@Bean
+	public CorsFilter corsFilter() {
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowedOrigins(allowedOrigins);
+		config.setAllowCredentials(true);
+		config.setAllowedMethods(allowedMethods);
+		config.setAllowedHeaders(allowedHeaders);
+		source.registerCorsConfiguration("/**", config);
+		return new CorsFilter(source);
+	}
+	/**/
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        http.addFilterBefore(corsFilter(), ChannelProcessingFilter.class);
-        http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/**").permitAll().antMatchers("/oauth/**")
-                .permitAll().antMatchers("/api/**").authenticated();
-    }
+	@Override
+	public void configure(HttpSecurity http) throws Exception {
+		http.addFilterBefore(corsFilter(), ChannelProcessingFilter.class);
+		http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/**").permitAll().
+				antMatchers("/oauth/**").permitAll().
+				antMatchers("/api/**").authenticated();
+	}
 
 }

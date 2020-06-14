@@ -22,54 +22,56 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    @Value("${security.oauth2.client.client-id}")
-    private String CLIENT_ID;
+	@Value("${security.oauth2.client.client-id}")
+	private String CLIENT_ID;
 
-    @Value("${security.oauth2.client.client-secret}")
-    private String SECRET_ID;
+	@Value("${security.oauth2.client.client-secret}")
+	private String SECRET_ID;
 
-    @Value("${security.oauth2.client.scope}")
-    private String SCOPES;
+	@Value("${security.oauth2.client.scope}")
+	private String SCOPES;
 
-    @Value("${security.oauth2.resource.id}")
-    private String RESOURCE_ID;
+	@Value("${security.oauth2.resource.id}")
+	private String RESOURCE_ID;
 
-    @Autowired
-    @Qualifier("bCryptPasswordEncoder")
-    public BCryptPasswordEncoder bCryptPasswordEncoder;
+	@Autowired
+	@Qualifier("bCryptPasswordEncoder")
+	public BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    @Qualifier(BeanIds.AUTHENTICATION_MANAGER)
-    public AuthenticationManager authenticationManager;
+	@Autowired
+	@Qualifier(BeanIds.AUTHENTICATION_MANAGER)
+	public AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserDetailsService customUserDetailsService;
+	@Autowired
+	private UserDetailsService customUserDetailsService;
 
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.allowFormAuthenticationForClients();
-        security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
-    }
+	@Override
+	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+		security.allowFormAuthenticationForClients();
+		security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+	}
 
-    @Override
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory().withClient(CLIENT_ID).secret(bCryptPasswordEncoder.encode(SECRET_ID))
-                .accessTokenValiditySeconds(5000).authorizedGrantTypes("password", "refresh_token").scopes(SCOPES)
-                .autoApprove(true).resourceIds(RESOURCE_ID);
-    }
+	@Override
+	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+		clients.inMemory().withClient(CLIENT_ID).secret(bCryptPasswordEncoder.encode(SECRET_ID))
+				.accessTokenValiditySeconds(5000)
+				.authorizedGrantTypes("authorization_code", "client_credentials", "password", "refresh_token")
+				.scopes(SCOPES).autoApprove(true).resourceIds(RESOURCE_ID);
+	}
 
-    @Autowired
-    private RedisConnectionFactory connectionFactory;
+	@Autowired
+	private RedisConnectionFactory connectionFactory;
 
-    @Bean(name = "authRedisTokenStore")
-    public TokenStore tokenStore() {
-        return new RedisTokenStore(connectionFactory);
-    }
+	@Bean(name = "authRedisTokenStore")
+	public TokenStore tokenStore() {
+		return new RedisTokenStore(connectionFactory);
+	}
 
-    @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager)
-                .userDetailsService(customUserDetailsService);
-    }
+	@Override
+	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager)
+				.userDetailsService(customUserDetailsService);
+
+	}
 
 }
