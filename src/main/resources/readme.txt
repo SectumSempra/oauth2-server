@@ -37,3 +37,8 @@ b smsm/
 
 curl -X POST -H "Authorization: Basic ZGVtbzpkZW1v"  -d "grant_type=password-sms&username=b&password=b&scope=demoScope" http://localhost:18085/oauth/token
 
+
+--docker redis-
+docker run --name localredis -d redis  --protected-mode no
+
+

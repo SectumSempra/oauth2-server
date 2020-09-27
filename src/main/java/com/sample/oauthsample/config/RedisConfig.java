@@ -35,7 +35,7 @@ public class RedisConfig {
     public RedisStandaloneConfiguration redisStandaloneConfiguration() {
 	RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
 	redisStandaloneConfiguration.setDatabase(redisProperties.database);
-	redisStandaloneConfiguration.setHostName(redisProperties.host);
+	redisStandaloneConfiguration.setHostName(redisProperties.host.trim());
 	redisStandaloneConfiguration.setPort(redisProperties.port);
 	// redisStandaloneConfiguration.setPassword(RedisPassword.of(redisProperties.password));
 	return redisStandaloneConfiguration;
@@ -60,7 +60,7 @@ public class RedisConfig {
     @Bean(name = "redisConnectionFactory")
     public RedisConnectionFactory redisConnectionFactory() {
 	RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-	redisStandaloneConfiguration.setHostName(redisProperties.host);
+	redisStandaloneConfiguration.setHostName(redisProperties.host.trim());
 	redisStandaloneConfiguration.setPort(redisProperties.port);
 	redisStandaloneConfiguration.setDatabase(redisProperties.database);
 
