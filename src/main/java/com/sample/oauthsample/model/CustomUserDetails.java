@@ -9,6 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails extends Users implements UserDetails {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4306555044567425600L;
+
     public CustomUserDetails() {
     }
 
@@ -17,7 +22,7 @@ public class CustomUserDetails extends Users implements UserDetails {
     }
 
     @Override
-    public Collection< ? extends GrantedAuthority> getAuthorities() {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
 	return getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRole())).collect(Collectors.toList());
     }
 
