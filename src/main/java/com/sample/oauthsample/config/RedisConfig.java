@@ -21,7 +21,6 @@ import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Configuration
 public class RedisConfig {
