@@ -1,7 +1,6 @@
 package com.sample.oauthsample.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -17,12 +16,11 @@ public class ResourceApplication extends ResourceServerConfigurerAdapter {
     private String RESOURCE_ID;
 
     @Autowired
-    @Qualifier("authRedisTokenStore")
-    public TokenStore tokenStore;
+    public TokenStore redisTokenStore;
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-	resources.tokenStore(tokenStore).resourceId(RESOURCE_ID);
+	resources.tokenStore(redisTokenStore).resourceId(RESOURCE_ID);
 
     }
 
