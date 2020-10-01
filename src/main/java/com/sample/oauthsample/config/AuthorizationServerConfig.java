@@ -63,8 +63,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 	clients.inMemory().withClient(CLIENT_ID).secret(bCryptPasswordEncoder.encode(SECRET_ID))
-		.accessTokenValiditySeconds(10000).authorizedGrantTypes("password-sms", "mfa", "authorization_code",
-			"client_credentials", "password", "refresh_token")
+		.accessTokenValiditySeconds(60 * 5).refreshTokenValiditySeconds(60 * 4)
+		.authorizedGrantTypes("password-sms", "mfa", "authorization_code", "client_credentials", "password",
+			"refresh_token")
 		.scopes(SCOPES).autoApprove(true).resourceIds(RESOURCE_ID);
     }
 
@@ -72,15 +73,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Qualifier("redisConnectionFactory")
     private RedisConnectionFactory redisConnectionFactory;
 
-    @Bean(name = "authRedisTokenStore")
-    public TokenStore tokenStore() {
+    @Bean
+    public TokenStore redisTokenStore() {
 	return new RedisTokenStore(redisConnectionFactory);
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-	endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager)
-		.userDetailsService(customUserDetailsService).tokenGranter(getalltokenGranters(endpoints));
+	endpoints.tokenStore(redisTokenStore()).authenticationManager(authenticationManager)
+		.userDetailsService(customUserDetailsService).tokenGranter(getalltokenGranters(endpoints))
+		.reuseRefreshTokens(false);
 
     }
 

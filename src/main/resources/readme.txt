@@ -39,6 +39,6 @@ curl -X POST -H "Authorization: Basic ZGVtbzpkZW1v"  -d "grant_type=password-sms
 
 
 --docker redis-
-docker run --name localredis -d redis  --protected-mode no
+docker run  -p 6379:6379 -d --name localredis redis redis-server --protected-mode no 
 
 
