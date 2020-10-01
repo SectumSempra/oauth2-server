@@ -15,11 +15,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "users")
-public class Users implements Serializable{
+public class Users implements Serializable {
 
     @Id
     @Column(name = "user_id")
-    private int id;
+    private long id;
 
     @Column(name = "email")
     private String email;
@@ -52,11 +52,11 @@ public class Users implements Serializable{
 
     }
 
-    public int getId() {
+    public long getId() {
 	return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
 	this.id = id;
     }
 
