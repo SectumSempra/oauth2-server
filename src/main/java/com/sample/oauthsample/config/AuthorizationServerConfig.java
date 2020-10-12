@@ -63,7 +63,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 	clients.inMemory().withClient(CLIENT_ID).secret(bCryptPasswordEncoder.encode(SECRET_ID))
-		.accessTokenValiditySeconds(60 * 5).refreshTokenValiditySeconds(60 * 4)
+		.accessTokenValiditySeconds(60 * 20).refreshTokenValiditySeconds(60 * 20)
 		.authorizedGrantTypes("password-sms", "mfa", "authorization_code", "client_credentials", "password",
 			"refresh_token")
 		.scopes(SCOPES).autoApprove(true).resourceIds(RESOURCE_ID);
