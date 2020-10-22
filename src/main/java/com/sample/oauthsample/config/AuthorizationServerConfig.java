@@ -26,6 +26,7 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
 
 import com.sample.oauthsample.config.provider.MfaTokenGranter;
 import com.sample.oauthsample.config.provider.PasswordTokenGranter;
+import com.sample.oauthsample.config.redis.AppRedisUtils;
 
 @Configuration
 @EnableAuthorizationServer
@@ -70,17 +71,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     }
 
     @Autowired
-    @Qualifier("redisConnectionFactory")
-    private RedisConnectionFactory redisConnectionFactory;
-
-    @Bean
-    public TokenStore redisTokenStore() {
-	return new RedisTokenStore(redisConnectionFactory);
-    }
+    @Qualifier("tokenStore")
+    private TokenStore tokenStore;
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-	endpoints.tokenStore(redisTokenStore()).authenticationManager(authenticationManager)
+	endpoints.tokenStore(tokenStore).authenticationManager(authenticationManager)
 		.userDetailsService(customUserDetailsService).tokenGranter(getalltokenGranters(endpoints))
 		.reuseRefreshTokens(false);
 

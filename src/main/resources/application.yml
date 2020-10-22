@@ -18,6 +18,7 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
+###########################    
 
 security:
   basic:
@@ -30,7 +31,14 @@ security:
     authorization:
       check-token-access: permitAll()
     resource:
-      id: authServerResource      
+      id: authServerResource 
+###########################    
+
 logging:
   level:
     org.springframework.security: DEBUG
+###########################    
+    
+app-config:
+  caches:
+    test : 60     
