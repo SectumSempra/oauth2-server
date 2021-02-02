@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableTransactionManagement
 @EnableCaching
 @SpringBootApplication
-public class OauthServerApplication implements CommandLineRunner {
+public class OAuthServer2Application implements CommandLineRunner {
 
     @Bean
     public RestTemplate restTemplate() {
@@ -23,7 +23,9 @@ public class OauthServerApplication implements CommandLineRunner {
     };
 
     public static void main(String[] args) {
-	SpringApplication.run(OauthServerApplication.class, args);
+	System.setProperty("spring.devtools.restart.enabled", "false");
+
+	SpringApplication.run(OAuthServer2Application.class, args);
     }
 
     @Override
