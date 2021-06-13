@@ -40,15 +40,17 @@ http://localhost:18085/oauth/authorize?response_type=code&client_id=test&redirec
 curl http://localhost:18084/api/currentUser -H "Authorization: Bearer d1a891bc-2612-408f-ac1f-3bffa0f26fcd" -H "Content-type: application/json; charset=utf-8"
 
 
-curl http://localhost:18084/api/employee-list-all/ -H "Authorization: Bearer ec8b60c2-3368-482f-b7be-b5f6770f291c" -H "Content-type: application/json; charset=utf-8"
+curl http://localhost:18084/api/employee-list-all/ -H "Authorization: Bearer 7d280eef-be8f-40e6-8a78-3f32609b61a9" -H "Content-type: application/json; charset=utf-8"
 
 
 curl http://localhost:18084/api/get-all-regions  -H "Authorization: Bearer 156b7e1e-3045-4940-a87b-19648c0ce4c7" -H "Content-type: application/json; charset=utf-8"
 
 
 
-curl http://localhost:18085/principal -H "Authorization: Bearer ec8b60c2-3368-482f-b7be-b5f6770f291c"
+curl http://localhost:18085/api/principal -H "Authorization: Bearer 7d280eef-be8f-40e6-8a78-3f32609b61a9"
 
+
+curl http://localhost:18085/api/user/hello -H "Authorization: Bearer 7d280eef-be8f-40e6-8a78-3f32609b61a9"
 
  curl -X POST -H "Content-Type: application/x-www-form-urlencoded"  -d "grant_type=password&username=abc&password=abc&scope=demoScope" http://localhost:18085/oauth/token
 
@@ -93,22 +95,5 @@ docker run  -p 6379:6379 -d --name localredis redis redis-server --protected-mod
 
 auth-server: http://localhost:18085
 
-server:
-  port: 8484
-  context-path: /client
 
-security:
-    oauth2:
-      client:
-        client-id: test
-        client-secret: test
-        access-token-uri: ${auth-server}/oauth/token
-        user-authorization-uri: ${auth-server}/oauth/authorize
-      resource:
-        user-info-uri: ${auth-server}/principal
 
-@SpringBootApplication
-@Configuration
-@RestController
-@EnableOAuth2Sso
-public class ClientApplication {

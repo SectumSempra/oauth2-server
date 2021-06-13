@@ -1,11 +1,11 @@
 package com.sample.oauthsample.config;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,12 +21,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.sample.oauthsample.config.provider.CustomAuthenticationProvider;
 
-@Order(2)
 @Configuration
 @EnableWebSecurity
 public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
@@ -71,51 +70,33 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
     /**/
 
     /************ Cors ***********/
-//    private final List<String> allowedOrigins = Arrays.asList("*");
-//
-//    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "Access-Control-Allow-Origin",
-//	    "Authorization");
-//
-//    private final List<String> allowedMethods = Arrays.asList("POST", "GET", "OPTIONS", "PUT");
-//
-//    @Bean
-//    public CorsFilter corsFilter() {
-//	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//	CorsConfiguration config = new CorsConfiguration();
-//	config.setAllowedOrigins(allowedOrigins);
-//	config.setAllowCredentials(true);
-//	config.setAllowedMethods(allowedMethods);
-//	config.setAllowedHeaders(allowedHeaders);
-//	source.registerCorsConfiguration("/**", config);
-//	return new CorsFilter(source);
-//    }
-    /**/
+    private final List<String> allowedOrigins = Arrays.asList("*");
+
+    private final List<String> allowedHeaders = Arrays.asList("Content-Type", "Access-Control-Allow-Origin",
+	    "Authorization");
+
+    private final List<String> allowedMethods = Arrays.asList("POST", "GET", "OPTIONS", "PUT");
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-	CorsConfiguration configuration = new CorsConfiguration();
-	configuration.setAllowedOrigins(Arrays.asList("*"));
-	configuration.setAllowedMethods(Arrays.asList("*"));
+    public CorsFilter corsFilter() {
 	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	source.registerCorsConfiguration("/**", configuration);
-	return source;
+	CorsConfiguration config = new CorsConfiguration();
+	config.setAllowedOrigins(allowedOrigins);
+	config.setAllowCredentials(true);
+	config.setAllowedMethods(allowedMethods);
+	config.setAllowedHeaders(allowedHeaders);
+	source.registerCorsConfiguration("/**", config);
+	return new CorsFilter(source);
     }
+    /**/
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-	/*
-	 * http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(
-	 * SessionCreationPolicy.IF_REQUIRED)
-	 * .and().authorizeRequests().anyRequest().authenticated().and().formLogin().and
-	 * ().httpBasic();
-	 */
+	http.addFilterBefore(corsFilter(), ChannelProcessingFilter.class);
+	http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+		.authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/**").permitAll().antMatchers("/oauth/**")
+		.permitAll().antMatchers("/h2-db/**").permitAll().antMatchers("/api/**").authenticated();
 
-	http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
-		.and().requestMatchers().antMatchers("/login", "/oauth/**")/**/
-		.and().authorizeRequests().anyRequest().authenticated()/**/
-		.and().formLogin().and().httpBasic();/**/
     }
-    
-    
 
 }
